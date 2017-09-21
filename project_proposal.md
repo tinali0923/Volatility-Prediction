@@ -9,7 +9,9 @@ Our new approach to predict volatility is to use a combination of market, indust
 Our input data would include:
 
 Market Factors: S&P 500, DJI, NASDAQ, etc.
+
 Industry Factors: Google Trend, S&P500 Information Technology, Industry specific PPI, etc.
+
 Company Factors: Google Trend, P/E, Market Cap, EBITDA, Turnover, Liquidity ratio, etc.
 
 Each factor category contains information that would influence equity price, and thus the volatility from each factor would influence and reflect on the volatility for specfic stock. For example, Brexit introduces global market volatility, and thus it would reflect on stock price of large cap company that has a global exposure. And, company specific factors like low liquidity ratio probably implies that the company is more vulnerable to market shock.
