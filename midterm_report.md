@@ -1,16 +1,9 @@
-<snippet>
-  <content><![CDATA[
 # Midterm Report
-Explore Raw Data
+
+## Raw Data Exploration
 
 
 
-<snippet>
-  <content><![CDATA[
-# ${1:Project Name}
-TODO: Write a project description
-## Midterm Report
-TODO: Describe the installation process
 ## Usage
 TODO: Write usage instructions
 ## Contributing
@@ -25,6 +18,3 @@ TODO: Write history
 TODO: Write credits
 ## License
 TODO: Write license
-]]></content>
-  <tabTrigger>readme</tabTrigger>
-</snippet>
