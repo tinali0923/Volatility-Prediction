@@ -67,7 +67,7 @@ We first regressed Volatility over each single feature separately. The motivatio
 Vol = a*Feature+b
 \end{equation}
 Vol : Normalized Volatility
-\\Feature: We regress volatility against each of the feature variable in normalized form.
+\\Feature: We regress Volatility against each of the feature variable in normalized form.
 
 Figure 3 (left) shows the predicted Volatility against real Volatility of test set. As can be seen from the graph, data scattered focusing on the red line, which is prediction equals to real value. Therefore, we concluded that PE has explanatory power over Volatility, and we decided to keep this feature.
 
@@ -102,7 +102,7 @@ Figure 3 (right) shows that data scattered focusing on the line of prediction re
 
 
 \section{Future Plan}
-1. Since some of the pre-selected features did not show strong correlations, such as Free Cash Flow, we need to find more features that have higher explanatory power over the movement of Volatility. In our preliminary analysis, closing price could be a promising feature that worth further exploration.
-\\\\2. At this stage, we only invested the linear relationship between Volatility and our features. There is possibility that the relationship exists in other form, such as non-linear. We will also consider feature engineering possibilities such as adjacent and lags.
+1. Since some of the pre-selected features did not show strong correlations, such as Free Cash Flow, we need to find more features that have higher explanatory power over the movement of Volatility. In our preliminary analysis, closing price could be a promising feature that is worth further exploration.
+\\\\2. At this stage, we only investigated the linear relationship between Volatility and our features. There is possibility that the relationship exists in other form, such as non-linear. We will also consider feature engineering possibilities such as adjacency and lags.
 
 \end{document}
