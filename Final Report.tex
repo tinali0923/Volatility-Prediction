@@ -1,4 +1,4 @@
-\documentclass[b4paper]{article}
+\documentclass[a4paper]{article}
 
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
@@ -26,20 +26,16 @@
 \maketitle  
 
 \begin{abstract}
-This project aims to develop a deeper understanding of stock return volatility. Traditionally, people use historical volatility as an estimation for future volatility. This project hypothesizes that a better volatility estimation could be attained through other information such as stock fundamentals and sentiment analysis. We have applied PCA to fill our missing data, and used K-fold cross validation, as well as using linear regression with Lasso and Ridge to fit our data. As the result we found out that three parameters out of the 10 parameters we selected have significant predictive power on volatility.
+This project aims to develop a deeper understanding of stock return volatility. Traditionally, people use historical volatility as an estimation for future volatility. This project hypothesizes that a better volatility estimation could be obtained through other information such as stock fundamentals and sentiment analysis information. We applied PCA to fill our missing data, and used K-fold cross validation to train our hyper-parameters. For fitting the data, we applied linear regression with Lasso, Ridge and Huber loss functions. As the result we found out that three parameters out of the 10 parameters we selected have significant predictive power over volatility.
 \end{abstract}
 
 \section{Exploring Raw Data}
-\label{sec:introduction}
-
 \subsection{Description}
-
 \begin{figure}[h]
 \centering
 \includegraphics[width=150mm, scale=1.5]{Volatility.png}
 \caption{\label{fig:scatter plot}Volatility Data Sample}
 \end{figure}
-
 The volatility that we wish to predict is the volatility of all stocks in NYSE. (See sample in Figure 1) Our raw data come from Bloomberg, with a time span of 10 years. The data consist of one outcome variable, which is the volatility of stock daily returns over the past three months, and nine feature variables which are quarterly data of Asset Turnover, Current Ratio, Debt to Asset, Invested Capital, PE Ratio, Closing Price, Lagged Volatility, Implied Volatility, as well as Google Trend analysis of key words 'NYSE' and 'VIX'. (See variable explanation in appendix A. See sample raw data in Figure 3, Section 1.3) Total number of data point is 107,304. Since we have feature data that scale only from 0 to 1, and we have feature data that are in hundred-level, we normalized our feature data and volatility data for truthful investigation of their relationship. 
 
 \subsection{Basic Exploration}
@@ -68,7 +64,6 @@ There are several challenges during data cleaning. As shown in Figure 3, the PE 
 To tackle the first problem, we replaced the old indexes, which came in mixed forms of string and integer, with new self-created indexing in the form of pandas.datetime(). With the new index, we re-aligned the data with higher precision and generated a read-friendly database.
 \subsubsection{PCA: Filling in Missing Data}
 For the second problem, we investigated all the features for each stock. For any missing values in our data matrix, we used PCA model to auto-fill in the data that's missing. The PCA loss function is stated as follows:
-
 \begin{equation}
 min ||Y-XW||^2
 \end{equation}
@@ -81,11 +76,10 @@ W & Feature vector\\
 \hline
  \end{tabular}
 \end{center}
-
 After the analysis, we multiplied X and W to generate the data for each single feature with all missing data filled. We applied PCA separately on data of each feature before flattening the data. (Flattening here means concatenating the data together to become the feature matrix.) The reason behind is that if we did PCA analysis after flattening the data, the filled data for one specific stock will include information from other stocks as well, which is not wanted since a specific stock's feature data is only most correlated with other data under that feature for this stock.
 
 \subsection{Data Formatting}
-We formated our sample data by first normalizing our dependent variable and independent variable for comparability since some feature data scale in 0 to 1 while some other feature data scale in 100s. Second we concatenated the data matrix of each feature together. After concatenation, our finalized sample data would be normalized volatility data for dependent variable. The columns for feature data matrix would be the 10 features that we selected, and the rows would be repetitive time. See Figure for finalized sample data.
+We formated our sample data by first normalizing our dependent variable and independent variable for comparability since some feature data scale in 0 to 1 while some other feature data scale in 100s. Second we concatenated the data matrix of each feature together. After concatenation, our finalized sample data would be normalized volatility data for dependent variable. The columns for feature data matrix would be the 10 features that we selected, and the rows would be repetitive time. See Figure 4 for finalized sample data.
 
 \begin{figure}[h]
 \centering
@@ -95,18 +89,16 @@ We formated our sample data by first normalizing our dependent variable and inde
 
 \section{Preliminary Regression and Analysis}
 \label{sec:theory}
-In this section, we made the temporary assumption that our outcome variable, which is Volatility, is in linear relationship feature variables. We divided our data into training and test set with ratio 3:2.
+In this section, we made the temporary assumption that our outcome variable, which is Volatility, is in linear relationship feature variables. We divided our data into training and test set with ratio 2:1.
 
 \subsection{Linear Regression with One Feature}
 We first regressed Volatility over each single feature separately. The motivation is to find out whether any feature has strong enough explanatory only by itself. An example of Volatility regressing against Price Earning Ratio is shown.
-
 \begin{equation}
 Vol = a*Feature+b
 \end{equation}
 Vol : Normalized Volatility
 \\Feature: We regress Volatility against each of the feature variable in normalized form.
-
-Figure 3 shows the predicted Volatility against real Volatility of test set. As can be seen from the graph, data scattered focusing on the red line, which is prediction equals to real value. Therefore, we concluded that PE has explanatory power over Volatility, and this feature is worth keep exploring.
+\\\\Figure 5 shows the predicted Volatility against real Volatility of test set. As can be seen from the graph, data scattered focusing on the red line, which is prediction equals to real value. Therefore, we concluded that PE has explanatory power over Volatility, and this feature is worth keep exploring.
 
 \begin{figure}[h]
 \centering
@@ -116,21 +108,19 @@ Figure 3 shows the predicted Volatility against real Volatility of test set. As 
 
 \subsection{The Correlation Matrix}
 Before we first fit data with our model, we wanted to know whether there is significant correlation between features, in other words, any possibilities of multicollinearity. We investigated the correlation relationship using covariance matrix. See Figure 6 for correlation matrix.
-
 \begin{figure}[h]
 \centering
 \includegraphics[width=80mm, scale=2]{Cov_Max.jpg}
 \caption{\label{fig:scatter plot}Correlation Matrix}
 \end{figure}
-
-As seen from the graph, most correlation terms are rather insignificant besides the correlation of VIX\_Tr and NYSE\_Tr. The correlation between these two features are over 0.6. In this case, we are expecting these two features either to be not important to volatility prediction at the same time, or that one of the features will be dropped when we are using Lasso regression.
+\\\\As seen from the graph, most correlation terms are rather insignificant besides the correlation of VIX\_Tr and NYSE\_Tr. The correlation between these two features are over 0.6. In this case, we are expecting these two features either to be not important to volatility prediction at the same time, or that one of the features will be dropped when we are using Lasso regression.
 
 
 \section{Fitting the Data Using Machine Learning Method}
-In this section, we ran linear regressions with different loss functions and select the model that fits best, and then test the selected model on test data. We will first use K-fold cross validation to select the hyper-parameter, and then we fit data with Lasso and Ridge. will use cross validation to select
+In this section, we ran linear regressions with different loss functions and select the model that fits best, and then test the selected model on test data. We will first use K-fold cross validation to select the hyper-parameter, and then we fit data with Lasso, Ridge and Huber. will use cross validation to select
 
 \subsection{The Linear Regression}
-We have chosen linear regression to fit our data. The equation is shown below. We are going to use Lasso and Ridge Regression to fit the linear regression.
+We have chosen linear regression to fit our data. The equation is shown below. We are going to use loss functions of Lasso, Ridge, and Huber regressions to fit the data.
 \begin{equation}
 Vol = w_1*AT+w_2*CR+w_3*DA+w_4*IC+w_5*PE+w_6*Close+w_7*Lag\_Vol+w_8*Imp\_Vol+w_9*VIX\_Tr+W_{10}*NYSE\_Tr+constant
 \end{equation}
@@ -157,78 +147,93 @@ Constant & constant (intercept) term\\
 \subsection{Lasso}
 For Lasso, the regularizor is l1 norm. The loss function is shown below:
 \begin{equation}
-min \sum (y_i - \widetilde{y})^2 + \lambda \sum |w|_{l1}
+min \frac{1}{n} \sum (y_i - \widetilde{y})^2 + \lambda \sum |w|_{l1}
 \end{equation}
 
 \subsubsection{K-Fold Cross Validation}
-First of all, we split the data into 2:1 training set and test set. We decide the value of $\lambda$ using K-fold cross validation on the training set. The following is a plot of mean squared error of the resulting model as a function of $\lambda$.
+First of all, we split the data into 2:1 training set and test set. We decide the value of $\lambda$ using K-fold cross validation on the training set. Figure 7 (left) is a plot of mean squared error of the resulting model as a function of $\lambda$. We selected our $\lambda$ which is the value that achieves the lowest error.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=130mm, scale=2]{lambda.png}
-\caption{\label{fig:lambda}Error as a Function of $\lambda$}
+\caption{\label{fig:lambda}Error as a Function of $\lambda$: Left for Lasso and right for Ridge}
 \end{figure}
 
 \subsection{Ridge}
 For Ridge, the regularizor is l2 norm. The loss function is shown below:
 \begin{equation}
-min \sum (y_i - \widetilde{y})^2 + \lambda \sum |w|_{l2}
+min \frac{1}{n} \sum (y_i - \widetilde{y})^2 + \lambda \sum |w|_{l2}
 \end{equation}
 
 \subsubsection{K-Fold Cross Validation}
-Same procedure as in Lasso. We split the data into 2:1 training set and test set. We decide the value of $\lambda$ using K-fold cross validation on the training set. The following is a plot of mean squared error of the resulting model as a function of $\lambda$.
+Same procedure as in Lasso. We split the data into 2:1 training set and test set. We decide the value of $\lambda$ using K-fold cross validation on the training set. Figure 7 (right) is a plot of mean squared error of the resulting model as a function of $\lambda$. We selected our $\lambda$ which is the value that achieves the lowest error.
+
+\subsection{Huber}
+For Huber, the regularizor is l2 norm. We applied gradient descent to solve the optimization question. The loss function is shown below:
+
+\begin{equation}
+min \frac{1}{n} \sum huber(y_i - \widetilde{y})^2 + \lambda \sum |w|_{l2}
+\end{equation}
+\begin{equation}
+huber(z) = \begin{cases} \frac{1}{2}z^2, & \mbox{if } |z| \leq \epsilon \\ |z|-\frac{1}{2}, & \mbox{if } |z| > \epsilon \end{cases}
+\end{equation}
+
+\subsubsection{K-Fold Cross Validation}
+We conducted K-fold cross validation for selecting both $\epsilon$ as well as $\lambda$. First of all we set the regularization term to zero, and select value of $\epsilon$ at the point when error term is the lowest. And then we select $\lambda$ with the decided $\epsilon$ value, at the point where the error term is the lowest. Figure 8 shows the relationship of error and $\epsilon$ as well as $\lambda$.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=170mm, scale=2]{EpLam.png}
+\caption{\label{fig:scatter plot}The relationship between error vs. $\epsilon$ and error vs. $\lambda$}
+\end{figure}
 
 \subsection{Model Selection}
-We fitted both Lasso and Ridge regression on the data, and calculated the mean squared error for both regression. And we selected the model with lower mean squared error to be the model that we will use for testing.
-
-Below is the chart for the parameters as result of fitting.
+We fitted both Lasso, Ridge and Huber regression on the validation data, and calculated the mean squared error for both regression. And we selected the model with lower mean squared error to be the model that we will use for testing.
+\\\\Below is the chart for the parameters as result of fitting.
 \begin{center}
-\begin{tabular}{ l | c | c   }
+\begin{tabular}{ l | c | c | c  }
  \hline
-Parameters& Lasso & Ridge\\
+Parameters& Lasso & Ridge & Huber\\
  \hline
-AT & 0.0123 & 0.00735\\
+AT & 0.0123 & 0.00735 & 0.579\\
  \hline
-CR & -0.188 & -0.0563\\
+CR & -0.188 & -0.0563 & -0.776\\
  \hline
-DA & 0.0522 & 0.0557\\
+DA & 0.0522 & 0.0557 & 0.962\\
  \hline
-IC & 5.82e-08 & 5.59e-08\\
+IC & 5.82e-08 & 5.59e-08 & 0.766\\
  \hline
-PE & 0.000436 & 0.000356\\
+PE & 0.000436 & 0.000356 & 1.61\\
  \hline
-Close & 0.0518 & 0.0302\\
+Close & 0.0518 & 0.0302 & 2.6\\
  \hline
-Lag\_Vol & 0.413 & 0.264\\
+Lag\_Vol & 0.413 & 0.264 & 11.5\\
  \hline
-Imp\_Vol & -0.243 & -0.187\\
+Imp\_Vol & -0.243 & -0.187 & -3.19\\
  \hline
-VIX\_Tr & 0.000123 & 0.000432\\
+VIX\_Tr & 0.000123 & 0.000432 & -0.503\\
  \hline
-NYSE\_Tr & 0.00292 & 0.00113\\
+NYSE\_Tr & 0.00292 & 0.00113 & -0.126\\
  \hline
-Constant & constant (intercept) term\\
+Constant & 5.167 & 7.484 & 21.406\\
 \hline
  \end{tabular}
 \end{center}   
-
 Below is the comparison of mean squared error (MSE) of both Lasso and Ridge.
 \begin{center}
-\begin{tabular}{ l | c | c  }
+\begin{tabular}{ l | c | c | c }
  \hline
- & Lasso & Ridge\\
+ & Lasso & Ridge & Huber\\
  \hline
-MSE & 324.331 & 334.574\\
+MSE & 324.331 & 334.574 & 328.164\\
 \hline
  \end{tabular}
 \end{center}   
-
 Judging from the mean squared error from the training result, we should use Lasso regression as the model to proceed to test the data.
 
 \subsection{The Testing Result}
 We applied Lasso to the testing data, and obtained the mean squared error of 316.331. Judging from that this number didn't increase too much from the mean squared error obtained in training set by Lasso, our model doesn't have the problem of over fitting. 
-
-Figure 8 shows the plot of predicted volatility against real volatility. There is a clear linear relationship between prediction and real values.
+\\\\Figure 9 shows the plot of predicted volatility against real volatility. There is a clear linear relationship between prediction and real values.
 
 \begin{figure}[h]
 \centering
@@ -237,8 +242,9 @@ Figure 8 shows the plot of predicted volatility against real volatility. There i
 \end{figure}
 
 \section{Analysis}
-\subsection{Lasso vs. Ridge}
+\subsection{Lasso vs. Ridge vs. Huber}
 Comparing the parameter results from Lasso and Ridge, we can see that for same feature, the parameter achieved by Lasso and Ridge is very close to each other, which adds confidence to the regression result.
+\\\\For the parameters obtained from Huber loss function, all the parameters have absolute values that are much greater than those from Lasso and Ridge. In fact, all parameters are around 20 to 100 multiples of those in Lasso and Ridge. However, the relative relationships between parameters in terms of scale and direction stayed the same. Our explanation is that the lambda in the regularization term in Huber regression took a value of 0.003, very close to 0. In this case, parameters were allowed to take much larger absolute values while keeping their relative relationships.
 \subsection{The Parameters}
 According to the parameters achieved by Lasso, the rather significant contributors to volatility are Lag\_Vol, Imp\_Vol and CR, in order of significance. 
 \\\\For Lag\_Vol, which is the volatility of last quarter, the positive parameter means that volatility data are actually autocorrelated, and volatility of the next quarter is significantly related with volatility from last quarter.
@@ -247,12 +253,12 @@ According to the parameters achieved by Lasso, the rather significant contributo
 \\\\At the same time, the low parameters for VIX\_Tr and NYSE\_Tr validates what we have predicted in the correlation matrix section: since their correlation is so high, it is possible that they could be simultaneously insignificant in their parameters.
 
 \section{Conclusion}
-We have applied PCA to fill our missing data, and used K-fold cross validation, as well as using linear regression with Lasso and Ridge to fit our data. Our model has achieved a test set mean squared error of 316.331, which is very close to mean squared error from training set. This signals that we did not over fit.
+We have applied PCA to fill our missing data, and used K-fold cross validation, as well as using linear regression with Lasso, Ridge and Huber loss functions to fit our data. Our model has achieved a test set mean squared error of 316.331, which is very close to mean squared error from training set. This signals that we did not over fit.
 \\\\The parameter results are very intuitive: for positive parameter of lagged volatility, it signals that volatilities are actually autoregressive in a short term. For negative parameter of implied short-term volatility, it signals that when short term volatility is high, the long term volatility should be lower, reflecting the mean-reversion mechanism of the market. For negative parameter of current ratio, it implies that when the company has enough asset, the volatility is low. When the company's solvency ability is low, the volatility is high.
 
 
 \section{Appendix}
-\subsection{A. Variable explanation}
+\subsection{Variable explanation}
 \begin{center}
 \begin{tabular}{ |p{5cm} | p{10cm} | }
  \hline
@@ -277,10 +283,6 @@ Implied Volatility (Imp\_Vol) & This measures the short-term implied volatility 
 VIX Trend (VIX\_Tr) & This is a Google-Trend measurement of how hot the 'VIX' key word is being searched. VIX is an index measuring market volatility over the future 30 days.\\
  \hline
 NYSE Trend (NYSE\_Tr) & This is a Google-Trend measurement of how hot the 'NYSE' key word is being searched.\\
- \hline
-Free Cash Ratio (FCF) & Measures a company's ability to generate cash after all the maintenance of asset base. Calculated by Operating Cash Flow-Capital Expenditure. \\
- \hline
-Debt to Equity (DE) & Another measure of a company's leverage. Calculated by Total Debt/Total Equity.\\
 \hline
 \end{tabular}
 \end{center}
